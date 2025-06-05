@@ -1,0 +1,1 @@
+This code sends characters over UART to MCU which converts the message to uppercase letters and sends it back to the user. The board used: stm32f44re. HAL driver is utilized but the code is written ground up(STMCubeMX generated only the startup files and the drivers)
