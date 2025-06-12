@@ -7,15 +7,39 @@ void UART2_Init(void);
 void Error_Handler(void);
 
 UART_HandleTypeDef huart2;
-char user_data = "Hello World!\r\n";
+// Safe to type cast to uint8_t* since char is 1 byte as well
+char* user_data = "Hello World!\r\n";
 
 
 int main(void){
 
+	// Initializations
 	HAL_Init(); // Developer must define Msp_Init()
 	SystemClockConfig(); // Developer-defined
-
 	UART2_Init();
+
+	// Send test data
+	uint16_t data_len = strlen(user_data);
+	if( HAL_UART_Transmit(&huart2, (uint8_t*) user_data, data_len, HAL_MAX_DELAY) != HAL_OK){
+		Error_Handler();
+	}
+
+	// Read data
+	uint8_t counter = 0;
+	uint8_t rcv_byte;
+	uint8_t rcv_buffer[100];
+	HAL_UART_Receive(&huart2, &rcv_byte, 1, HAL_MAX_DELAY);
+
+	while (counter < 100 && rcv_byte != '\n' && rcv_byte != '\r'){
+		rcv_buffer[counter] = rcv_byte;
+		HAL_UART_Receive(&huart2, &rcv_byte, 1, HAL_MAX_DELAY);
+		counter++;
+	}
+
+	// Send its modified version back to the PC
+	HAL_UART_Transmit(&huart2, (uint8_t*)rcv_buffer, counter, HAL_MAX_DELAY);
+
+	while(1);
 
 	return 0;
 }

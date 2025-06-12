@@ -38,35 +38,35 @@ void HAL_MspInit( void )
   */
 void HAL_UART_MspInit( UART_HandleTypeDef *huart ){
 
-	// 1. Enable the corresponding clock
-	__HAL_RCC_USART2_CLK_ENABLE();
+	if(huart->Instance == USART2){
 
-	// 2. Pin muxing (PA2, PA3)
-	__HAL_RCC_GPIOA_CLK_ENABLE();
+		// 1. Enable the corresponding clock
+		__HAL_RCC_USART2_CLK_ENABLE();
 
-	GPIO_TypeDef GPIOA_Def;
+		// 2. Pin muxing (PA2, PA3)
+		__HAL_RCC_GPIOA_CLK_ENABLE();
 
-	GPIO_InitTypeDef GPIOPA_Init;
-	GPIOPA_Init.Pin = GPIO_PIN_2;
-	GPIOPA_Init.Mode = GPIO_MODE_AF_PP;
-	GPIOPA_Init.Pull = GPIO_PULLUP;
-	GPIOPA_Init.Speed = GPIO_SPEED_FREQ_LOW;
-	GPIOPA_Init.Alternate = GPIO_AF7_USART2;
-	HAL_GPIO_Init(&GPIOA_Def, &GPIOPA_Init); // PA2 - TX
+		GPIO_InitTypeDef GPIOPA_Init;
+		GPIOPA_Init.Pin = GPIO_PIN_2;
+		GPIOPA_Init.Mode = GPIO_MODE_AF_PP;
+		GPIOPA_Init.Pull = GPIO_PULLUP;
+		GPIOPA_Init.Speed = GPIO_SPEED_FREQ_LOW;
+		GPIOPA_Init.Alternate = GPIO_AF7_USART2;
+		HAL_GPIO_Init(GPIOA, &GPIOPA_Init); // PA2 - TX
 
-	GPIOPA_Init.Pin = GPIO_PIN_3;
-	HAL_GPIO_Init(&GPIOA_Def, &GPIOPA_Init); // PA3 - RX
-	/*
-	 * Manual equivalent:
-	uint32_t* pointer = (uint32_t*)(GPIOA_BASE+0x20);
-	*pointer &= ~(0b11111111 << 8); // clear AFRL3 and AFRL2
-	*pointer |= GPIO_AF7_USART2 << 8; // Set AFRL2 to AF7
-	*pointer |= GPIO_AF7_USART2 << 12; // Set AFRL3 to AF7
-	*/
+		GPIOPA_Init.Pin = GPIO_PIN_3;
+		HAL_GPIO_Init(GPIOA, &GPIOPA_Init); // PA3 - RX
+		/*
+		 * Manual equivalent:
+		uint32_t* pointer = (uint32_t*)(GPIOA_BASE+0x20);
+		*pointer &= ~(0b11111111 << 8); // clear AFRL3 and AFRL2
+		*pointer |= GPIO_AF7_USART2 << 8; // Set AFRL2 to AF7
+		*pointer |= GPIO_AF7_USART2 << 12; // Set AFRL3 to AF7
+		*/
 
-	// 3. Enable IRQ and Priority Settings
-	HAL_NVIC_EnableIRQ(USART2_IRQn);
-	HAL_NVIC_SetPriority(USART2_IRQn, 15, 0);
-
+		// 3. Enable IRQ and Priority Settings
+		HAL_NVIC_EnableIRQ(USART2_IRQn);
+		HAL_NVIC_SetPriority(USART2_IRQn, 15, 0);
+	}
 
 }
