@@ -28,13 +28,16 @@ int main(void){
 	uint8_t counter = 0;
 	uint8_t rcv_byte;
 	uint8_t rcv_buffer[100];
-	HAL_UART_Receive(&huart2, &rcv_byte, 1, HAL_MAX_DELAY);
 
-	while (counter < 100 && rcv_byte != '\n' && rcv_byte != '\r'){
-		rcv_buffer[counter] = rcv_byte;
+	while ( counter < 100 && rcv_byte != '\r' ){
 		HAL_UART_Receive(&huart2, &rcv_byte, 1, HAL_MAX_DELAY);
+		rcv_buffer[counter] = toupper(rcv_byte);
 		counter++;
 	}
+
+	// Add a new line
+	rcv_buffer[counter] = '\n';
+	counter++;
 
 	// Send its modified version back to the PC
 	HAL_UART_Transmit(&huart2, (uint8_t*)rcv_buffer, counter, HAL_MAX_DELAY);
